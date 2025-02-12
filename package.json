@@ -1,0 +1,47 @@
+{
+  "name": "escribe",
+  "version": "1.0.0",
+  "description": "Transform Speech into Text, Instantly and Effortlessly!",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "SET NODE_ENV=production&&nodemon server.js"
+  },
+  "keywords": [
+    "speech-to-text",
+    "audio-transcriber",
+    "transcription"
+  ],
+  "author": "friyo",
+  "license": "ISC",
+  "dependencies": {
+    "@deepgram/sdk": "^3.10.1",
+    "@google-cloud/translate": "^8.5.0",
+    "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.5.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-jq": "^6.0.1",
+    "nodemailer": "^6.9.16",
+    "openai": "^4.83.0",
+    "validator": "^13.12.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.4.2"
+  }
+}
