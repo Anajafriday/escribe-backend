@@ -10,14 +10,14 @@ const TranslationSchema = new mongoose.Schema({
   sourceLanguage: {
     type: String,
     required: [true, "pls provide the language you want to translate from"],
-    default: "English",
+    default: "en",
   },
   targetLanguage: {
     type: String,
     required: [true, "pls provide the language you want to translate to"],
   },
   translatedText: {
-    type: String,
+    type: mongoose.Schema.Types.Mixed,
     required: [true, "pls provide the text you have  translated"],
   },
   translationTool: { type: String, default: "Google Translate" }, // Or provide the tool used

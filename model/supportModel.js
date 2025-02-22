@@ -18,4 +18,11 @@ const SupportSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+SupportSchema.methods.updateSupportStatus = async function (newStatus) {
+  if (!["Open", "Resolved"].includes(newStatus)) {
+    throw new Error('Invalid status value');
+  }
+  this.status = newStatus;
+  if (this.status === "Resolved") this.updatedAt = new Date()
+}
 module.exports = mongoose.model("Support", SupportSchema);

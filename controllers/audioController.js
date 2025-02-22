@@ -7,6 +7,7 @@ const { createClient } = require("@deepgram/sdk");
 const Audio = require("../model/audioModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const { formatConversation, parseTranscriptionText } = require("../utils/helper");
 // ✅ Configure Deepgram sdk for audio transcription
 const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
 
@@ -58,54 +59,9 @@ const getAudioDuration = async (buffer) => {
     });
   });
 };
-const formatConversation = (utterances) => {
-  const formattedConversations = [];
-  let currentConversation = {};
-
-  utterances.forEach(({ speaker, transcript }) => {
-    const speakerKey = `Speaker ${speaker}`;
-
-    // If the current conversation already has a different speaker, push it and start a new one
-    if (currentConversation[speakerKey]) {
-      formattedConversations.push(currentConversation);
-      currentConversation = {};
-    }
-
-    // Add transcript to the conversation object
-    currentConversation[speakerKey] = transcript;
-  });
-
-  // Push the last conversation if not empty
-  if (Object.keys(currentConversation).length > 0) {
-    formattedConversations.push(currentConversation);
-  }
-
-  return formattedConversations;
-};
-const parseTranscriptionText = (text) => {
-  const utterances = [];
-  const lines = text.split("\n"); // Split by new lines
-
-  lines.forEach((line) => {
-    const match = line.match(/^Speaker:(\d+)\s(.+)/); // Match "Speaker:X Sentence"
-    if (match) {
-      const speaker = parseInt(match[1], 10);
-      const transcript = match[2].trim();
-
-      // If the last utterance has the same speaker, merge the transcript
-      if (utterances.length > 0 && utterances[utterances.length - 1].speaker === speaker) {
-        utterances[utterances.length - 1].transcript += " " + transcript;
-      } else {
-        utterances.push({ speaker, transcript });
-      }
-    }
-  });
-
-  return utterances;
-};
 
 // ✅ Format the transcription output to improve readability
-const formatTranscription = (utterances) => {
+const formatTranscription = (utterances, lang) => {
   let formattedText = "";
   let groupedSpeakers = {};
   let currentSpeaker = "";
@@ -131,7 +87,7 @@ const formatTranscription = (utterances) => {
   });
 
   if (buffer) formattedText += `${buffer}\n`;
-  const formattedTextObj = formatConversation(parseTranscriptionText(formattedText))
+  const formattedTextObj = formatConversation(parseTranscriptionText(formattedText), lang)
   /*
 {
     "Speaker 0": "What type of websites do you often search for?",
@@ -168,7 +124,7 @@ exports.transcribeAudio = async (fileUrl) => {
     // Check if multiple speakers are detected
     const hasMultipleSpeakers = transcription.results.utterances.some((u) => u.speaker > 0);
     // Format conversation if multiple speakers exist
-    const formattedConversation = formatTranscription(transcription.results.utterances);
+    const formattedConversation = formatTranscription(transcription.results.utterances, transcription.results.channels[0].detected_language);
     const transcript = hasMultipleSpeakers
       ? formattedConversation
       : transcription.results.channels[0].alternatives[0].transcript;
