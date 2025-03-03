@@ -7,7 +7,7 @@ const audioController = require('./audioController');
 exports.generateAudioTranscripts = catchAsync(async (req, res, next) => {
     // Retrieve the final audio metadata from the request (added in a previous middleware)
     const audioData = req.finalAudio;
-
+    const userId = req.user._id;
     // If no audio data is found, return an error
     if (!audioData) return next(new AppError("Please specify an audio file", 400));
 
@@ -23,6 +23,7 @@ exports.generateAudioTranscripts = catchAsync(async (req, res, next) => {
             audio: audioData._id, // Reference to the audio file
             transcript, // Transcribed text
             language, // Detected language
+            userId,
             translationAvailable: !!language // Boolean to indicate if a language was detected
         });
 

@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
     minLength: 8,
-    select: false, // Exclude from queries
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -37,6 +37,7 @@ const UserSchema = new mongoose.Schema({
   subscriptionEndDate: { type: Date },
   dailyTranscriptionLimit: { type: Number, default: 10 },
   passwordResetToken: { type: String },
+  passwordUpdatedAt: { type: Date },
   passwordResetExpires: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -50,6 +51,18 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
+// 
+UserSchema.methods.CheckPasswordChanged = function (JWTtimeStamp) {
+  if (this.passwordUpdatedAt) {
+    const passwordUpdatedAtTimestamp = parseInt(
+      this.passwordUpdatedAt.getDate() / 1000,
+      10
+    );
+    return JWTtimeStamp < passwordUpdatedAtTimestamp;
+  }
+  // return false meaning password is not changed
+  return false;
+};
 // Method to check password
 UserSchema.methods.checkCorrectPassword = async function (candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword);
@@ -63,6 +76,21 @@ UserSchema.methods.createPasswordResetToken = function () {
   this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes expiration
   return resetToken;
+};
+// 
+UserSchema.methods.decreaseTranscriptionLimit = async function () {
+  // Check if the user is on a free trial and has remaining transcriptions
+  if (this.isTrialActive && new Date() < new Date(this.trialEndDate)) {
+    if (this.dailyTranscriptionLimit > 0) {
+      this.dailyTranscriptionLimit -= 1; // Reduce the limit by 1
+      await this.save(); // Save the updated limit
+      return true; // Allow transcription
+    } else {
+      return false; // No transcriptions left
+    }
+  }
+
+  return true; // Allow if not on free trial
 };
 
 module.exports = mongoose.model("User", UserSchema);

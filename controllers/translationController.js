@@ -6,11 +6,6 @@ const Transcription = require("../model/transcriptionModel");
 const { translate: translateWithBing } = require('bing-translate-api');
 const { parseTranscriptionText, formatConversation } = require("../utils/helper");
 
-// Initialize Google Translate API
-// const translateWithGoogle = new Translate({
-//     projectId: process.env.GOOGLE_TRANSLATE_PROJECT_ID,
-//     key: process.env.GOOGLE_TRANSLATE_API_KEY
-// });
 
 /**
  * Translates text from one language to another using Bing Translate API.
@@ -43,7 +38,7 @@ async function translateText(text, from, to) {
  */
 exports.translateTranscript = catchAsync(async (req, res, next) => {
     const { transcriptionId, targetLang: targetLanguage } = req.params;
-    // const targetLanguage = req.body.targetLang;
+    const userId = req.user._id;
 
     // Validate input parameters
     if (!transcriptionId || !targetLanguage) {
@@ -72,7 +67,8 @@ exports.translateTranscript = catchAsync(async (req, res, next) => {
         translatedText,
         sourceLanguage,
         targetLanguage,
-        translationTool: "BING"
+        translationTool: "BING",
+        userId
     });
 
     // Handle potential failure in updating translation status

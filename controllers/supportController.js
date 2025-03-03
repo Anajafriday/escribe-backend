@@ -11,9 +11,6 @@ const User = require("../model/userModel");
  * - (TODO) Sends an email to the support team upon successful submission.
  */
 exports.messageSupport = catchAsync(async (req, res, next) => {
-    // Allow email to be passed via URL parameters
-    if (req.params.email) req.body.email = req.params.email;
-
     // Retrieve user ID from email if not explicitly provided
     if (!req.body.userId && req.body.email) {
         const user = await User.findOne({ email: req.body.email });
@@ -21,7 +18,7 @@ exports.messageSupport = catchAsync(async (req, res, next) => {
             return next(new AppError("The provided email does not exist in our records.", 404));
         }
 
-        req.body.userId = user.__vid;
+        req.body.userId = user.__id;
     }
 
 

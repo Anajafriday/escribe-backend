@@ -6,7 +6,7 @@ const TranscriptionSchema = new mongoose.Schema({
     ref: "Audio",
     required: true,
   },
-  // user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   transcript: {
     type: mongoose.Schema.Types.Mixed, // Can be either a string or an array of objects
     required: [true, "Transcript is required."]
