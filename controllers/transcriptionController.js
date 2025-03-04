@@ -7,7 +7,8 @@ const audioController = require('./audioController');
 exports.generateAudioTranscripts = catchAsync(async (req, res, next) => {
     // Retrieve the final audio metadata from the request (added in a previous middleware)
     const audioData = req.finalAudio;
-    const userId = req.user._id;
+    const user = req.user;
+    const { userId } = user._id
     // If no audio data is found, return an error
     if (!audioData) return next(new AppError("Please specify an audio file", 400));
 
@@ -29,7 +30,8 @@ exports.generateAudioTranscripts = catchAsync(async (req, res, next) => {
 
         // ✅ Update the audio transcription status to "Completed"
         await audioData.updateTranscripeStatus("Completed");
-
+        // decrease transcription Limit
+        await user.decreaseTranscriptionLimit()
         // ✅ Send success response
         res.status(200).json({
             status: "success",
@@ -39,9 +41,8 @@ exports.generateAudioTranscripts = catchAsync(async (req, res, next) => {
     } catch (error) {
         // ✅ If an error occurs, update the transcription status to "Failed"
         await audioData.updateTranscripeStatus("Failed");
-
         // Log the error for debugging purposes
-        console.log("TRANSCRIPTION ERROR: ", error);
+        // console.log("TRANSCRIPTION ERROR: ", error);
 
         // Return an error response
         next(new AppError(`Transcription failed. Try again later. ${error.message}`, 500));

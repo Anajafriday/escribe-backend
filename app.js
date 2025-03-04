@@ -12,12 +12,14 @@ if (process.env.NODE_ENV === "development") {
 const audioRoute = require("./routes/audioRoutes");
 const transcriptionRoute = require("./routes/transcriptionRoutes");
 const translationRoute = require("./routes/translationRoutes");
+const supportRoute = require("./routes/supportRoutes");
 const userRoute = require("./routes/userRoutes");
 const AppError = require("./utils/appError");
 app.use("/api/v1/transcripts", transcriptionRoute)
 app.use("/api/v1/audios", audioRoute)
 app.use("/api/v1/translations", translationRoute)
 app.use("/api/v1/users", userRoute)
+app.use("/api/v1/supports", supportRoute)
 // Handle undefined routes
 app.all("*", (req, res, next) => {
   next(new AppError(`The page ${req.originalUrl} cannot be found`, 404));

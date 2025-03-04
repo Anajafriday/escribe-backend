@@ -24,5 +24,6 @@ SupportSchema.methods.updateSupportStatus = async function (newStatus) {
   }
   this.status = newStatus;
   if (this.status === "Resolved") this.updatedAt = new Date()
+  await this.save()
 }
 module.exports = mongoose.model("Support", SupportSchema);

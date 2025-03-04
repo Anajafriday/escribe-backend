@@ -41,6 +41,7 @@ AudioFileSchema.methods.updateTranscripeStatus = async function (newStatus) {
   }
   this.transcriptionStatus = newStatus;
   if (this.transcriptionStatus === "Completed") this.updatedAt = new Date()
+  await this.save()
 }
 // Exporting the model
 module.exports = mongoose.model("Audio", AudioFileSchema);

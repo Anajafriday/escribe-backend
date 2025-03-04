@@ -80,9 +80,8 @@ exports.restrictToSubscribedUsers = (req, res, next) => {
 
 exports.checkTranscriptionLimit = async (req, res, next) => {
     const user = req.user; // Retrieved from `protect` middleware
-
-    // Decrease transcription limit if on free trial
-    const canProceed = await user.decreaseTranscriptionLimit();
+    // check trial limit if on free trial
+    const canProceed = user.checkTrialEnded();
 
     if (!canProceed) {
         return next(new AppError("You've reached your daily transcription limit. Upgrade your plan to continue.", 403));

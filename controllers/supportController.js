@@ -15,10 +15,10 @@ exports.messageSupport = catchAsync(async (req, res, next) => {
     if (!req.body.userId && req.body.email) {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
-            return next(new AppError("The provided email does not exist in our records.", 404));
+            return next(new AppError("The provided email does not exist in our records, Provide a registered email.", 404));
         }
 
-        req.body.userId = user.__id;
+        req.body.userId = user._id;
     }
 
 
@@ -51,7 +51,7 @@ exports.resolveSupport = catchAsync(async (req, res, next) => {
     if (!userSupport) {
         return next(new AppError("The requested support ticket could not be found.", 404));
     }
-
+    console.log(userSupport.status)
     // Check if the support ticket is already resolved
     if (userSupport.status === "Resolved") {
         return next(new AppError("This support request has already been resolved.", 400));
@@ -59,14 +59,14 @@ exports.resolveSupport = catchAsync(async (req, res, next) => {
 
     try {
         // TODO: Send an email notification with the resolution message (message from rich text editor)
-
+        console.log(message)
         // Update support status to "Resolved"
         await userSupport.updateSupportStatus("Resolved");
-
         // Send a success response
         res.status(200).json({
             status: "success",
             message: "Support request has been successfully resolved.",
+            data: { userSupport }
         });
     } catch (err) {
         // Log the error and revert the support status to "Open" in case of failure

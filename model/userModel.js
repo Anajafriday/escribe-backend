@@ -84,13 +84,19 @@ UserSchema.methods.decreaseTranscriptionLimit = async function () {
     if (this.dailyTranscriptionLimit > 0) {
       this.dailyTranscriptionLimit -= 1; // Reduce the limit by 1
       await this.save(); // Save the updated limit
-      return true; // Allow transcription
-    } else {
-      return false; // No transcriptions left
     }
   }
+  // check if free trial has end 
+  UserSchema.methods.checkTrialEnded = function () {
+    if (this.isTrialActive && new Date() < new Date(this.trialEndDate)) {
+      if (this.dailyTranscriptionLimit > 0) {
+        return true // Allow transcription
+      }
+      return false // No transcriptions left
+    }
 
-  return true; // Allow if not on free trial
-};
+    return true // Allow if not on free trial
+  }
+}
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("User", UserSchema)

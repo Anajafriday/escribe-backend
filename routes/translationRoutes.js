@@ -4,7 +4,7 @@ const authController = require("../controllers/authController")
 
 const Router = express.Router()
 
-Router.use(authController.protect, authController.restrictToSubscribedUsers)
+Router.use(authController.protect, authController.restrictToSubscribedUsers, authController.checkTranscriptionLimit)
 
 Router.route("/:transcriptionId/:targetLang").post(translationController.translateTranscript)
 

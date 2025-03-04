@@ -36,5 +36,6 @@ TranslationSchema.methods.updateTranslationStatus = async function (newStatus) {
   }
   this.translationStatus = newStatus;
   if (this.translationStatus === "Completed") this.updatedAt = new Date()
+  await this.save()
 }
 module.exports = mongoose.model("Translation", TranslationSchema);

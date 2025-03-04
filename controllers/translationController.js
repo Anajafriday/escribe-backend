@@ -77,7 +77,6 @@ exports.translateTranscript = catchAsync(async (req, res, next) => {
     }
 
     await newTranslation.updateTranslationStatus("Completed");
-
     // Return successful response
     res.status(201).json({
         status: "success",
